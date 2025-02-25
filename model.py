@@ -5,9 +5,6 @@ from torch import nn
 from torchtext.vocab import GloVe
 
 
-DATASET_DIR = "/scratch/asm6590/cse-587-midterm/dataset"
-
-glove_vectors = GloVe(name="6B", dim=100, cache=DATASET_DIR)
 
 VOCAB_FILE = os.path.join(DATASET_DIR, "reuters_vocab.json")
 
@@ -22,16 +19,19 @@ EMBED_DIM = 100
 
 class DocumentClf(nn.Module):
     
-    def __init__(self, num_classes):
+    def __init__(self, dataset_name):
         super(DocumentClf, self).__init__()
 
+        self.vocab_size = vocab_size
+        self.embed_dim = embed_dim
+        
         # Embeddings
-        embedding_matrix = torch.zeros((VOCAB_SIZE, EMBED_DIM))
+        embedding_matrix = torch.zeros((vocab_size, embed_dim))
 
         for word, idx in word_to_idx.items():
-            embedding_matrix[idx] = glove_vectors[word] if word in glove_vectors.stoi else torch.zeros(EMBED_DIM)
+            embedding_matrix[idx] = glove_vectors[word] if word in glove_vectors.stoi else torch.zeros(embed_dim)
     
-        self.embedding = nn.Embedding(VOCAB_SIZE, EMBED_DIM, _weight=embedding_matrix)
+        self.embedding = nn.Embedding(vocab_size, embed_dim, _weight=embedding_matrix)
         
         # LSTMs
         self.fc = nn.Linear(EMBED_DIM, num_classes)

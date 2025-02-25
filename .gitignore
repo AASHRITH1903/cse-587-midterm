@@ -1,7 +1,8 @@
 __pycache__
 
-dataset/nltk_data
-dataset/glove*
-dataset/*.json
+data/glove_cache
+data/nltk_data
+data/preprocessed/*.json
+data/preprocessed/*.pt
 
 *.ipynb
