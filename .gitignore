@@ -1,0 +1,7 @@
+__pycache__
+
+dataset/nltk_data
+dataset/glove*
+dataset/*.json
+
+*.ipynb
