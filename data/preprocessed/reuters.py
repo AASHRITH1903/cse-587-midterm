@@ -16,9 +16,9 @@ nltk.data.path = [NLTK_DATA]
 
 from nltk.corpus import reuters
 
-nltk.download("reuters", download_dir=NLTK_DATA)
-nltk.download("punkt", download_dir=NLTK_DATA)
-nltk.download('punkt_tab', download_dir=NLTK_DATA)
+# nltk.download("reuters", download_dir=NLTK_DATA)
+# nltk.download("punkt", download_dir=NLTK_DATA)
+# nltk.download('punkt_tab', download_dir=NLTK_DATA)
 
 
 def tokenize(text):

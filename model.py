@@ -6,45 +6,48 @@ from torchtext.vocab import GloVe
 
 
 
-VOCAB_FILE = os.path.join(DATASET_DIR, "reuters_vocab.json")
-
-word_to_idx = json.load(open(VOCAB_FILE))
-
-VOCAB_SIZE = len(word_to_idx)
-
-EMBED_DIM = 100
-
-
-
-
-class DocumentClf(nn.Module):
+class Document_Classifier(nn.Module):
     
-    def __init__(self, dataset_name):
-        super(DocumentClf, self).__init__()
-
+    def __init__(self, vocab_size, embed_dim, hidden_dim, num_classes, embeds_path):
+        super(Document_Classifier, self).__init__()
+        
         self.vocab_size = vocab_size
         self.embed_dim = embed_dim
         
-        # Embeddings
-        embedding_matrix = torch.zeros((vocab_size, embed_dim))
-
-        for word, idx in word_to_idx.items():
-            embedding_matrix[idx] = glove_vectors[word] if word in glove_vectors.stoi else torch.zeros(embed_dim)
-    
-        self.embedding = nn.Embedding(vocab_size, embed_dim, _weight=embedding_matrix)
-        
-        # LSTMs
-        self.fc = nn.Linear(EMBED_DIM, num_classes)
+        self.embedding = nn.Embedding(
+            num_embeddings= vocab_size, 
+            embedding_dim= embed_dim, 
+            _weight= torch.load(embeds_path)
+        )
+        self.seq_enc = nn.LSTM(
+            input_size= embed_dim, 
+            hidden_size= hidden_dim, 
+            num_layers=2, 
+            bidirectional=True,
+        )
+        self.fc = nn.Linear(2*hidden_dim, num_classes)
         
     def forward(self, input_ids):
         
-        # input_ids: (batch_size, sequence_length)
-        print("Input: ", input_ids.shape)
+        input_ids = input_ids.permute(1, 0)
+        # print("input_ids", input_ids.shape)
         
-        embeds = self.embedding(input_ids)  # (batch_size, sequence_length, embed_dim)
+        embeds = self.embedding(input_ids) 
+        # print("embeds", embeds.shape)
         
-        print("Embeds: ", embeds.shape)
-        # For simplicity, take mean over sequence_length
-        pooled = embeds.mean(dim=1)
-        logits = self.fc(pooled)
+        encs, _ = self.seq_enc(embeds)
+        # print("encs", encs.shape)
+        # print("h", h.shape)
+        # print("c", c.shape)
+        
+        doc_enc = torch.mean(encs, dim=0)
+        # print("doc_enc", doc_enc.shape)
+        
+        logits = self.fc(doc_enc)
+        # print("logits", logits.shape)
+        
         return logits
+       
+        
+        
+        

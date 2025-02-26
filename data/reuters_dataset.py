@@ -6,19 +6,18 @@ import torch.nn as nn
 import torch.optim as optim
 from torchtext.vocab import GloVe
 from collections import Counter
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, DistributedSampler
 
 import nltk
 
-DATASET_DIR = "/scratch/asm6590/cse-587-midterm/dataset"
-NLTK_DATA = os.path.join(DATASET_DIR, "nltk_data")
+DATA_DIR = "/scratch/asm6590/cse-587-midterm/data"
+NLTK_DATA = os.path.join(DATA_DIR, "nltk_data")
 nltk.data.path = [NLTK_DATA]
 
 from nltk.corpus import reuters
 
 from data.preprocessed.reuters import (
     CONFIG_FILE, 
-    EMBED_FILE,
     tokenize
 )
 
@@ -56,13 +55,26 @@ def collate_fn(batch):
 
 
 
-def reuters_loader(split='train'):
+def get_loader(rank, world_size, local_batch_size=32, split='train'):
     
     if split == 'train':
-        train_dataset = ReutersDataset(config["train_docs"])
-        return DataLoader(train_dataset, batch_size=32, shuffle=True, collate_fn=collate_fn)
+        dataset = ReutersDataset(doc_ids= config["train_docs"])
+        sampler = DistributedSampler(
+            dataset= dataset, 
+            num_replicas= world_size, 
+            rank= rank, 
+            shuffle= True
+        )
+        loader = DataLoader(
+            dataset= dataset, 
+            batch_size= local_batch_size, 
+            sampler= sampler, 
+            collate_fn= collate_fn, 
+            num_workers= 4
+        )
+        return loader
     
     elif split == 'test':
-        test_dataset = ReutersDataset(config["test_docs"])
-        return DataLoader(test_dataset, batch_size=32, shuffle=False, collate_fn=collate_fn)
+        pass
+    
         
