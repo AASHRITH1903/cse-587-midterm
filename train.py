@@ -9,7 +9,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 
 from model.document_classifier import DocumentClassifier
 
-DATASET = "movie_reviews"
+DATASET = "brown"
 
 if DATASET == "reuters":
     from data.preprocessed.reuters import CONFIG_FILE, EMBED_FILE

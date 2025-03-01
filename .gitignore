@@ -5,6 +5,8 @@ data/nltk_data
 data/preprocessed/*.json
 data/preprocessed/*.pt
 
-checkpoints
+
+checkpoints/*/*
+!checkpoints/*/log.json
 
 *.ipynb

@@ -21,7 +21,7 @@ from nltk.corpus import brown
 # nltk.download("punkt", download_dir=NLTK_DATA)
 # nltk.download('punkt_tab', download_dir=NLTK_DATA)
 # nltk.download('movie_reviews', download_dir=NLTK_DATA)
-nltk.download('brown', download_dir=NLTK_DATA)
+# nltk.download('brown', download_dir=NLTK_DATA)
 
 
 def tokenize(text):
