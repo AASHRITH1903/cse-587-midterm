@@ -14,9 +14,9 @@ DATA_DIR = "/scratch/asm6590/cse-587-midterm/data"
 NLTK_DATA = os.path.join(DATA_DIR, "nltk_data")
 nltk.data.path = [NLTK_DATA]
 
-from nltk.corpus import reuters
+from nltk.corpus import brown
 
-from data.preprocessed.reuters import (
+from data.preprocessed.brown import (
     CONFIG_FILE, 
     tokenize
 )
@@ -27,7 +27,7 @@ word_to_idx = config["word_to_idx"]
 category_to_index = config["category_to_index"]
 
 
-class ReutersDataset(Dataset):
+class BrownDataset(Dataset):
     def __init__(self, doc_ids):
         self.doc_ids = doc_ids
 
@@ -36,9 +36,9 @@ class ReutersDataset(Dataset):
 
     def __getitem__(self, idx):
         doc_id = self.doc_ids[idx]
-        tokens = tokenize(reuters.raw(doc_id))
+        tokens = tokenize(brown.raw(doc_id))
         indices = [word_to_idx.get(word, word_to_idx["<UNK>"]) for word in tokens]
-        label = category_to_index[reuters.categories(doc_id)[0]]  # Assign first category
+        label = category_to_index[brown.categories(doc_id)[0]]  # Assign first category
         return torch.tensor(indices), torch.tensor(label)
 
 
@@ -58,7 +58,7 @@ def collate_fn(batch):
 def get_loader(rank, world_size, local_batch_size=32, split='train'):
     
     if split == 'train':
-        dataset = ReutersDataset(doc_ids= config["train_docs"])
+        dataset = BrownDataset(doc_ids= config["train_docs"])
         sampler = DistributedSampler(
             dataset= dataset, 
             num_replicas= world_size, 
@@ -75,7 +75,7 @@ def get_loader(rank, world_size, local_batch_size=32, split='train'):
         return loader
     
     elif split == 'val':
-        dataset = ReutersDataset(doc_ids= config["test_docs"])
+        dataset = BrownDataset(doc_ids= config["test_docs"])
         sampler = DistributedSampler(
             dataset= dataset, 
             num_replicas= world_size, 
@@ -91,4 +91,7 @@ def get_loader(rank, world_size, local_batch_size=32, split='train'):
         )
         return loader
     
+
         
+        
+    

@@ -1,0 +1,21 @@
+data:
+  dataset: reuters
+
+model:
+  # embeddings
+  vocab_size: 10000
+  emb_size: 100
+
+  # seq encoder
+  input_size: 100
+  hidden_size: 100
+
+  # classifier head
+  num_classes: 10
+
+training:
+  total_epochs: 10
+  learning_rate: 0.001
+  batch_size: 32
+
+
